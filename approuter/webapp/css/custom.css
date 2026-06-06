@@ -1,0 +1,45 @@
+/* Hide ObjectPage header pin and collapse buttons */
+[id$="-OPHeaderContent-pinBtn"],
+[id$="-OPHeaderContent-collapseBtn"],
+[id$="-OPHeaderContent-expandBtn"],
+[id$="-snap-header-btn"] {
+    display: none !important;
+}
+
+/* Hide DynamicPage (List Report) header collapse and pin buttons */
+[id^="__header"][id$="-collapseBtn"],
+[id^="__header"][id$="-pinBtn"],
+[id^="__header"][id$="-collapseBtn-img"],
+[id^="__header"][id$="-pinBtn-img"],
+.sapFDynamicPageCollapseButton,
+.sapFDynamicPageHeaderPinButton {
+    display: none !important;
+}
+
+/* Stretch table to full width */
+.sapMListTbl {
+    width: 100% !important;
+}
+.sapMListTblCell:last-child,
+.sapMListTblHeaderCell:last-child {
+    width: auto !important;
+}
+
+/* Editing Status dropdown — hide Unchanged(3rd), Locked(5th), Unsaved Changes(6th) */
+.sapMDLI:nth-child(3),
+.sapMDLI:nth-child(5),
+.sapMDLI:nth-child(6) {
+    display: none !important;
+}
+
+/* Rename 2nd item to Active, 4th to Draft */
+.sapMDLI:nth-child(2) .sapMDLILabel { font-size: 0 !important; }
+.sapMDLI:nth-child(2) .sapMDLILabel::after { content: 'Active'; font-size: 0.875rem; }
+.sapMDLI:nth-child(4) .sapMDLILabel { font-size: 0 !important; }
+.sapMDLI:nth-child(4) .sapMDLILabel::after { content: 'Draft'; font-size: 0.875rem; }
+
+/* Hide Share button — auto-generated __button in List Report and Object Page toolbars */
+[id*="CandidatesList--__button"],
+[id*="CandidatesObjectPage--__button"] {
+    display: none !important;
+}

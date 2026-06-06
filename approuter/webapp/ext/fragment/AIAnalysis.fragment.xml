@@ -1,0 +1,16 @@
+<core:FragmentDefinition
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m">
+
+    <core:HTML
+        id="aiAnalysisWidget1"
+        preferDOM="false"
+        sanitizeContent="false"
+        content="&lt;iframe
+            src=&quot;ai-analysis.html&quot;
+            id=&quot;aiAnalysisFrame&quot;
+            style=&quot;width:100%;height:300px;border:none;display:block;&quot;
+            title=&quot;AI Analysis&quot;&gt;
+        &lt;/iframe&gt;"/>
+
+</core:FragmentDefinition>

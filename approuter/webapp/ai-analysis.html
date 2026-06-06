@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>AI Analysis</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: '72', '72full', Arial, sans-serif; background: transparent; color: #1d2d3e; }
+
+.panel { padding: .75rem 1.25rem 1.5rem; }
+
+/* ── Empty state ── */
+.empty-state {
+  text-align: center; padding: 2.5rem 1rem; color: #89919a;
+  font-size: .85rem; line-height: 1.6;
+}
+.empty-icon { font-size: 2rem; margin-bottom: .5rem; opacity: .4; }
+
+/* ── Two-column layout ── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+/* ── Column header ── */
+.col-hd {
+  font-size: .78rem; font-weight: 700; color: #556b82;
+  text-transform: uppercase; letter-spacing: .07em;
+  margin-bottom: .65rem; display: flex; align-items: center; gap: .4rem;
+}
+.col-hd-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+}
+.dot-blue  { background: #0070f2; }
+.dot-green { background: #2e7d32; }
+
+/* ── CV text toggle button ── */
+.cv-toggle-btn {
+  background: none; border: 1.5px solid #cdd5e0; border-radius: 6px;
+  color: #556b82; font-size: .78rem; font-weight: 600;
+  padding: .35rem .8rem; cursor: pointer; margin-bottom: .6rem;
+  transition: all .15s;
+}
+.cv-toggle-btn:hover { border-color: #0070f2; color: #0070f2; background: #f0f7ff; }
+
+/* ── CV text box ── */
+.cv-text-box {
+  background: #f8f9fb; border: 1px solid #e4e7ec; border-radius: 8px;
+  padding: .9rem 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  font-size: .83rem; color: #2c3e50; line-height: 1.75;
+  white-space: pre-wrap; word-break: break-word;
+  max-height: 480px; overflow-y: auto;
+}
+.cv-text-box::-webkit-scrollbar { width: 5px; }
+.cv-text-box::-webkit-scrollbar-track { background: #f0f0f0; }
+.cv-text-box::-webkit-scrollbar-thumb { background: #c0c8d0; border-radius: 4px; }
+
+/* ── AI Summary card ── */
+.summary-card {
+  background: #f8f9fb; border: 1px solid #e4e7ec;
+  border-radius: 8px; overflow: hidden;
+}
+.ai-sec { padding: .8rem .95rem; }
+.ai-sec + .ai-sec { border-top: 1px solid #eef0f3; }
+.ai-sec-hd {
+  display: inline-flex; align-items: center; gap: .35rem;
+  font-size: .69rem; font-weight: 700; letter-spacing: .07em;
+  text-transform: uppercase; background: #0070f2; color: #fff;
+  padding: .2rem .6rem; border-radius: 4px; margin-bottom: .55rem;
+}
+.ai-text {
+  font-size: .84rem; color: #2c3e50; line-height: 1.72;
+  white-space: pre-wrap; word-break: break-word;
+}
+.ai-list { list-style: none; padding: 0; margin: 0; }
+.ai-list li {
+  font-size: .84rem; color: #2c3e50; line-height: 1.65;
+  padding: .22rem 0 .22rem 1.15rem; position: relative;
+}
+.ai-list li::before {
+  content: ''; position: absolute; left: 0; top: .63rem;
+  width: 6px; height: 6px; border-radius: 50%; background: #0070f2;
+}
+
+/* ── Responsive fallback ── */
+@media (max-width: 700px) {
+  .two-col { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="panel" id="panel">
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">&#128196;</div>
+    Upload and process a CV to see the AI analysis here.
+  </div>
+</div>
+<script>
+(function () {
+  'use strict';
+
+  var candidateId = (function () {
+    try {
+      var m = window.parent.location.hash.match(/Candidates\(ID=([^,)]+)/);
+      if (m) { localStorage.setItem('cvCandidateId', m[1]); return m[1]; }
+    } catch (e) {}
+    return localStorage.getItem('cvCandidateId');
+  }());
+
+  window.toggleCv = function (btn) {
+    var box = btn.nextElementSibling;
+    var open = box.style.display !== 'none';
+    box.style.display = open ? 'none' : 'block';
+    btn.innerHTML = open ? 'Show full text &#9660;' : 'Hide full text &#9650;';
+    adjustHeight();
+  };
+
+  function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function cleanText(s) {
+    return (s || '')
+      .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+      .replace(/\r\n/g, '\n')
+      .replace(/\r/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
+  function stripMd(s) {
+    return (s || '')
+      .replace(/\*\*([^*]*)\*\*/g, '$1')
+      .replace(/\*([^*]*)\*/g, '$1')
+      .replace(/_{2}([^_]*)_{2}/g, '$1');
+  }
+
+  function adjustHeight() {
+    if (window.frameElement) {
+      window.frameElement.style.height = (document.documentElement.scrollHeight + 24) + 'px';
+    }
+  }
+
+  function renderSummary(raw) {
+    var text = stripMd(raw || '');
+    var sections = [
+      { key: 'PROFESSIONAL SUMMARY', label: 'Professional Summary' },
+      { key: 'KEY STRENGTHS',        label: 'Key Strengths'        },
+      { key: 'SUGGESTED ROLE FIT',   label: 'Suggested Role Fit'   }
+    ];
+    var html = '';
+
+    sections.forEach(function (sec, i) {
+      var idx = text.indexOf(sec.key);
+      if (idx === -1) return;
+      var nextIdx = -1;
+      for (var j = i + 1; j < sections.length; j++) {
+        var ni = text.indexOf(sections[j].key, idx + sec.key.length);
+        if (ni > -1) { nextIdx = ni; break; }
+      }
+      var content = (nextIdx > -1
+        ? text.slice(idx + sec.key.length, nextIdx)
+        : text.slice(idx + sec.key.length)).trim();
+
+      html += '<div class="ai-sec"><div class="ai-sec-hd">' + esc(sec.label) + '</div>';
+
+      if (sec.key === 'KEY STRENGTHS') {
+        var items = content.split('\n').filter(function (l) { return l.trim().startsWith('•'); });
+        if (items.length) {
+          html += '<ul class="ai-list">';
+          items.forEach(function (item) {
+            html += '<li>' + esc(item.replace(/^[\s•]+/, '').trim()) + '</li>';
+          });
+          html += '</ul>';
+        } else {
+          html += '<p class="ai-text">' + esc(content) + '</p>';
+        }
+      } else {
+        html += '<p class="ai-text">' + esc(content) + '</p>';
+      }
+      html += '</div>';
+    });
+
+    return html || '<div class="ai-sec"><p class="ai-text">' + esc(text) + '</p></div>';
+  }
+
+  function render(d) {
+    if (!d || (!d.AISummary && !d.CVText)) {
+      adjustHeight();
+      return;
+    }
+
+    var panel = document.getElementById('panel');
+    var html = '<div class="two-col">';
+
+    // Left: CV text (collapsed by default)
+    html += '<div>';
+    html += '<div class="col-hd"><span class="col-hd-dot dot-blue"></span>Extracted CV Text</div>';
+    html += '<button class="cv-toggle-btn" onclick="toggleCv(this)">Show full text &#9660;</button>';
+    html += '<div class="cv-text-box" style="display:none">' + esc(cleanText(d.CVText || 'No text extracted.')) + '</div>';
+    html += '</div>';
+
+    // Right: AI Summary
+    html += '<div>';
+    html += '<div class="col-hd"><span class="col-hd-dot dot-green"></span>AI Summary</div>';
+    html += '<div class="summary-card">' + renderSummary(d.AISummary || '') + '</div>';
+    html += '</div>';
+
+    html += '</div>';
+    panel.innerHTML = html;
+    adjustHeight();
+  }
+
+  if (!candidateId) {
+    adjustHeight();
+    return;
+  }
+
+  var base = '/candidate/Candidates(ID=' + candidateId + ',IsActiveEntity=';
+  fetch(base + 'true)', { headers: { Accept: 'application/json' }, cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error('try draft'); return r.json(); })
+    .catch(function () {
+      return fetch(base + 'false)', { headers: { Accept: 'application/json' }, cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : null; });
+    })
+    .then(function (d) { render(d); })
+    .catch(function () { adjustHeight(); });
+
+}());
+</script>
+</body>
+</html>

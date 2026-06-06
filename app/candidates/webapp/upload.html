@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CV Upload — AI Screening</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: '72', '72full', Arial, sans-serif;
+    background: linear-gradient(135deg, #f0f4ff 0%, #fafafa 60%, #f0fff4 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Top bar ── */
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid #e8eaed;
+    padding: 0 2rem;
+    height: 3.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .topbar-back {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    color: #0070f2;
+    font-size: .875rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: .35rem .75rem;
+    border-radius: 6px;
+    transition: background .15s;
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+  .topbar-back:hover { background: #f0f7ff; }
+  .topbar-divider { width: 1px; height: 1.25rem; background: #e0e0e0; }
+  .topbar-title { font-size: .95rem; font-weight: 700; color: #1d2d3e; }
+  .topbar-badge {
+    margin-left: auto;
+    background: #e8f4ff;
+    color: #0050a0;
+    font-size: .75rem;
+    font-weight: 600;
+    padding: .2rem .65rem;
+    border-radius: 99px;
+  }
+
+  /* ── Main content ── */
+  .page {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2.5rem 1rem 3rem;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
+    width: 100%;
+    max-width: 620px;
+    overflow: hidden;
+  }
+
+  /* ── Card header ── */
+  .card-header {
+    background: linear-gradient(120deg, #0070f2 0%, #0050c8 100%);
+    padding: 2rem 2rem 1.75rem;
+    color: #fff;
+  }
+  .card-header-label {
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    opacity: .75;
+    margin-bottom: .4rem;
+  }
+  .card-header-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: .25rem;
+  }
+  .card-header-sub {
+    font-size: .85rem;
+    opacity: .8;
+  }
+
+  /* ── Steps ── */
+  .steps {
+    display: flex;
+    gap: 0;
+    background: #f8f9fb;
+    border-bottom: 1px solid #eaecef;
+  }
+  .step {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    padding: .9rem 1.25rem;
+    font-size: .8rem;
+    font-weight: 600;
+    color: #89919a;
+    border-bottom: 3px solid transparent;
+    transition: all .2s;
+  }
+  .step.active { color: #0070f2; border-bottom-color: #0070f2; }
+  .step.done   { color: #2e7d32; border-bottom-color: #2e7d32; }
+  .step-num {
+    width: 1.4rem; height: 1.4rem;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #666;
+    font-size: .7rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all .2s;
+  }
+  .step.active .step-num { background: #0070f2; color: #fff; }
+  .step.done   .step-num { background: #2e7d32; color: #fff; }
+
+  /* ── Card body ── */
+  .card-body { padding: 2rem; }
+
+  /* ── Drop zone ── */
+  .drop-zone {
+    border: 2px dashed #cdd5e0;
+    border-radius: 12px;
+    padding: 2.25rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+    background: #fafbfc;
+    position: relative;
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: #0070f2;
+    background: #f0f7ff;
+  }
+  .drop-zone.has-file {
+    border-color: #2e7d32;
+    background: #f1faf1;
+  }
+  .drop-icon {
+    width: 3rem; height: 3rem;
+    margin: 0 auto .75rem;
+    background: #e8f0fe;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .drop-icon svg { width: 1.5rem; height: 1.5rem; fill: #0070f2; }
+  .drop-zone.has-file .drop-icon { background: #e8f5e9; }
+  .drop-zone.has-file .drop-icon svg { fill: #2e7d32; }
+  .drop-title { font-size: .95rem; font-weight: 600; color: #1d2d3e; margin-bottom: .3rem; }
+  .drop-sub   { font-size: .8rem; color: #89919a; }
+  .drop-browse {
+    display: inline-block;
+    margin-top: .9rem;
+    padding: .45rem 1.1rem;
+    border: 1.5px solid #0070f2;
+    border-radius: 6px;
+    font-size: .8rem;
+    font-weight: 600;
+    color: #0070f2;
+    cursor: pointer;
+    transition: background .15s;
+    background: #fff;
+  }
+  .drop-browse:hover { background: #f0f7ff; }
+  .drop-zone.has-file .drop-browse { border-color: #2e7d32; color: #2e7d32; }
+  .drop-zone.has-file .drop-browse:hover { background: #f1faf1; }
+  .file-chosen {
+    display: none;
+    align-items: center;
+    gap: .5rem;
+    margin-top: .75rem;
+    font-size: .85rem;
+    font-weight: 500;
+    color: #2e7d32;
+    justify-content: center;
+  }
+  .drop-zone.has-file .file-chosen { display: flex; }
+  input[type=file] { display: none; }
+
+  /* ── Actions ── */
+  .actions {
+    display: flex;
+    gap: .75rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .6rem 1.4rem;
+    border-radius: 8px;
+    font-size: .875rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all .15s;
+    position: relative;
+    white-space: nowrap;
+  }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-primary { background: #0070f2; color: #fff; }
+  .btn-primary:not(:disabled):hover { background: #0060d0; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,112,242,.3); }
+  .btn-secondary { background: #fff; color: #0070f2; border: 1.5px solid #0070f2; }
+  .btn-secondary:not(:disabled):hover { background: #f0f7ff; transform: translateY(-1px); }
+
+  /* ── Spinner inside button ── */
+  .btn .spin {
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .65s linear infinite;
+    display: none;
+  }
+  .btn-secondary .spin { border-color: rgba(0,112,242,.3); border-top-color: #0070f2; }
+  .btn.loading .spin { display: inline-block; }
+  .btn.loading .btn-label { opacity: .7; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Status ── */
+  .status-wrap { margin-top: 1.25rem; }
+  .status-msg {
+    display: none;
+    align-items: flex-start;
+    gap: .65rem;
+    padding: .85rem 1rem;
+    border-radius: 8px;
+    font-size: .875rem;
+    font-weight: 500;
+    line-height: 1.5;
+    animation: fadeIn .25s ease;
+  }
+  .status-msg.show { display: flex; }
+  .status-msg.info    { background: #e8f2ff; color: #0050a0; border-left: 4px solid #0070f2; }
+  .status-msg.success { background: #edfaf0; color: #1a6b2e; border-left: 4px solid #2e7d32; }
+  .status-msg.error   { background: #fff0f0; color: #b71c1c; border-left: 4px solid #c62828; }
+  .status-icon { font-size: 1rem; flex-shrink: 0; margin-top: .05rem; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+  /* ── Footer hint ── */
+  .card-footer {
+    border-top: 1px solid #f0f2f5;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .78rem;
+    color: #89919a;
+  }
+  .card-footer svg { width: .9rem; height: .9rem; fill: #89919a; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="topbar-back" id="topbarBackBtn" onclick="history.back()">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back
+  </button>
+  <div class="topbar-divider"></div>
+  <span class="topbar-title">CV Upload &amp; AI Processing</span>
+  <span class="topbar-badge" id="topbarBadge">Loading…</span>
+</div>
+
+<div class="page">
+  <div class="card">
+
+    <div class="card-header">
+      <div class="card-header-label">Candidate</div>
+      <div class="card-header-name" id="candidateName">Loading…</div>
+      <div class="card-header-sub" id="candidateSub">Fetching candidate information</div>
+    </div>
+
+    <div class="steps">
+      <div class="step active" id="step1">
+        <div class="step-num">1</div>
+        Select &amp; Upload CV
+      </div>
+      <div class="step" id="step2">
+        <div class="step-num">2</div>
+        AI Processing
+      </div>
+      <div class="step" id="step3">
+        <div class="step-num">3</div>
+        Done
+      </div>
+    </div>
+
+    <div class="card-body">
+
+      <div class="drop-zone" id="dropZone"
+           ondragover="onDragOver(event)"
+           ondragleave="onDragLeave(event)"
+           ondrop="onDrop(event)"
+           onclick="document.getElementById('fileInput').click()">
+        <div class="drop-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
+          </svg>
+        </div>
+        <div class="drop-title" id="dropTitle">Drop your CV here</div>
+        <div class="drop-sub">PDF or DOCX, up to 10 MB</div>
+        <div class="drop-browse" id="dropBrowse" onclick="event.stopPropagation();document.getElementById('fileInput').click()">Browse files</div>
+        <div class="file-chosen" id="fileChosen">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <span id="fileChosenName"></span>
+        </div>
+        <input type="file" id="fileInput" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="onFileChange(this)"/>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="btnUpload" onclick="doUpload()" disabled>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+          <span class="btn-label">Upload CV</span>
+          <span class="spin"></span>
+        </button>
+        <button class="btn btn-secondary" id="btnProcess" onclick="doProcess()" disabled>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          <span class="btn-label">Process with AI</span>
+          <span class="spin"></span>
+        </button>
+      </div>
+
+      <div class="status-wrap">
+        <div class="status-msg" id="statusMsg">
+          <span class="status-icon" id="statusIcon"></span>
+          <span id="statusText"></span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card-footer">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+      AI extraction fills in name, email, phone, skills, experience, and role automatically.
+    </div>
+
+  </div>
+</div>
+
+<script>
+  var candidateId = null;
+
+  var isNewDraft = false;
+
+  (function init() {
+    var qs = new URLSearchParams(window.location.search);
+    candidateId = qs.get('id') || localStorage.getItem('cvCandidateId');
+
+    if (!candidateId) {
+      setName('No candidate selected', 'Navigate here from a candidate record in the app');
+      badge('—');
+      setStatus('error', '⚠', 'No candidate ID found. Please go back and open a candidate first.');
+      return;
+    }
+
+    // Try active entity first, then fall back to draft (unsaved new candidate)
+    function tryFetch(url) {
+      return fetch(url, { headers: { Accept: 'application/json' } })
+        .then(function(r) { if (!r.ok) throw new Error('not found'); return r.json(); });
+    }
+
+    tryFetch('/candidate/Candidates(ID=' + candidateId + ',IsActiveEntity=true)')
+      .catch(function() {
+        isNewDraft = true;
+        return tryFetch('/candidate/Candidates(ID=' + candidateId + ',IsActiveEntity=false)');
+      })
+      .then(function(d) {
+        var name = d.FullName;
+        var role = d.CurrentRole;
+
+        if (!name && isNewDraft) {
+          // Completely new unsaved candidate — no name yet, AI will fill it
+          setName('New Candidate', 'Upload a CV and AI will fill in all details automatically');
+          badge('New');
+          setStatus('info', 'ℹ', 'This candidate hasn\'t been saved yet. Upload a CV and process it — AI will auto-fill the name, email, skills and more. Then go back and click Save.');
+        } else {
+          setName(name || 'Unnamed Candidate', role || 'No role on file');
+          badge((name || 'Candidate').split(' ')[0]);
+          if (d.CVFileName) {
+            setStatus('info', 'ℹ', 'CV already on file: ' + escHtml(d.CVFileName) + ' — upload a new one or go straight to AI processing.');
+            document.getElementById('btnProcess').disabled = false;
+            setStep(2);
+          }
+        }
+      })
+      .catch(function() {
+        setName('New Candidate', 'Upload a CV to auto-fill this record');
+        badge('New');
+        isNewDraft = true;
+      });
+  }());
+
+  function setName(name, sub) {
+    document.getElementById('candidateName').textContent = name;
+    document.getElementById('candidateSub').textContent  = sub;
+  }
+  function badge(text) { document.getElementById('topbarBadge').textContent = text; }
+  function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function setStep(n) {
+    [1,2,3].forEach(function(i) {
+      var el = document.getElementById('step' + i);
+      el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+      if (i < n) el.querySelector('.step-num').textContent = '✓';
+    });
+  }
+
+  function setStatus(type, icon, text) {
+    var el   = document.getElementById('statusMsg');
+    el.className = 'status-msg show ' + type;
+    document.getElementById('statusIcon').textContent = icon;
+    document.getElementById('statusText').textContent = text;
+  }
+
+  function setLoading(btnId, loading) {
+    var btn = document.getElementById(btnId);
+    if (loading) btn.classList.add('loading');
+    else btn.classList.remove('loading');
+    btn.disabled = loading;
+  }
+
+  /* ── Drag & drop ── */
+  function onDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+  function onDragLeave() { document.getElementById('dropZone').classList.remove('drag-over'); }
+  function onDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').classList.remove('drag-over');
+    var files = e.dataTransfer && e.dataTransfer.files;
+    if (files && files[0]) applyFile(files[0]);
+  }
+
+  function onFileChange(input) {
+    if (input.files && input.files[0]) applyFile(input.files[0]);
+  }
+
+  function applyFile(file) {
+    var zone = document.getElementById('dropZone');
+    zone.classList.add('has-file');
+    document.getElementById('dropTitle').textContent = 'File ready to upload';
+    document.getElementById('dropBrowse').textContent = 'Change file';
+    document.getElementById('fileChosen').style.display = 'flex';
+    document.getElementById('fileChosenName').textContent = file.name;
+
+    // Sync to the real file input so doUpload can read it
+    var dt = new DataTransfer();
+    dt.items.add(file);
+    document.getElementById('fileInput').files = dt.files;
+
+    document.getElementById('btnUpload').disabled = false;
+    setStatus('info', 'ℹ', file.name + ' selected. Click "Upload CV" to continue.');
+  }
+
+  /* ── Upload ── */
+  function doUpload() {
+    var file = document.getElementById('fileInput').files[0];
+    if (!file || !candidateId) return;
+
+    setLoading('btnUpload', true);
+    setStatus('info', '⏳', 'Uploading ' + file.name + '…');
+
+    var fd = new FormData();
+    fd.append('cv', file, file.name);
+
+    fetch('/upload/' + candidateId, { method: 'POST', body: fd })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        setLoading('btnUpload', false);
+        if (d.success) {
+          setStatus('success', '✓', 'CV uploaded successfully (' + d.extractedLength.toLocaleString() + ' characters extracted). Click "Process with AI" to fill in the candidate profile.');
+          document.getElementById('btnProcess').disabled = false;
+          document.getElementById('btnUpload').disabled  = false;
+          setStep(2);
+        } else {
+          setStatus('error', '✕', d.error || 'Upload failed.');
+          document.getElementById('btnUpload').disabled = false;
+        }
+      })
+      .catch(function(e) {
+        setLoading('btnUpload', false);
+        setStatus('error', '✕', 'Upload failed: ' + e.message);
+        document.getElementById('btnUpload').disabled = false;
+      });
+  }
+
+  /* ── AI Process ── */
+  function doProcess() {
+    if (!candidateId) return;
+    setLoading('btnProcess', true);
+    setStatus('info', '⏳', 'AI is analysing the CV… this usually takes 10–20 seconds.');
+
+    fetch('/candidate/processCV', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ candidateID: candidateId })
+    })
+    .then(function(r) {
+      if (!r.ok) return r.json().then(function(e) { throw new Error((e.error && e.error.message) || 'AI processing failed.'); });
+      return r.json();
+    })
+    .then(function() {
+      setLoading('btnProcess', false);
+      document.getElementById('btnProcess').disabled = false;
+      var msg = isNewDraft
+        ? '✓ CV parsed! All fields have been filled in automatically. Click Back — the form will be populated, then click Save to create the candidate.'
+        : '✓ CV parsed successfully! The candidate profile has been updated. Click Back to see the results.';
+      setStatus('success', '✓', msg);
+      setStep(3);
+      // Force the back button to do a hard navigation so Fiori Elements reloads
+      // fresh data from the server instead of restoring from browser cache.
+      document.getElementById('topbarBackBtn').onclick = function () {
+        var isActive = isNewDraft ? 'false' : 'true';
+        window.location.href = 'index.html#Candidates(ID=' + candidateId + ',IsActiveEntity=' + isActive + ')';
+      };
+    })
+    .catch(function(e) {
+      setLoading('btnProcess', false);
+      document.getElementById('btnProcess').disabled = false;
+      setStatus('error', '✕', e.message || 'AI processing failed.');
+    });
+  }
+</script>
+</body>
+</html>

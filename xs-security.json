@@ -1,0 +1,25 @@
+{
+  "xsappname": "cv-screening-app",
+  "tenant-mode": "dedicated",
+  "description": "Security descriptor for CV Screening Application",
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.User",
+      "description": "Standard user access"
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "User",
+      "description": "CV Screening Application User",
+      "scope-references": ["$XSAPPNAME.User"]
+    }
+  ],
+  "role-collections": [
+    {
+      "name": "CV_Screening_User",
+      "description": "CV Screening Application Users",
+      "role-template-references": ["$XSAPPNAME.User"]
+    }
+  ]
+}

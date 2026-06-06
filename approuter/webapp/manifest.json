@@ -1,0 +1,148 @@
+{
+  "_version": "1.49.0",
+  "sap.app": {
+    "id": "cv.screening.candidates",
+    "type": "application",
+    "title": "Candidate Screening",
+    "description": "Candidate Screening & AI Evaluation Platform",
+    "applicationVersion": { "version": "1.0.0" },
+    "dataSources": {
+      "mainService": {
+        "uri": "/candidate/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "odataVersion": "4.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "fullWidth": true
+  },
+  "sap.ui5": {
+    "flexEnabled": false,
+    "extends": {
+      "extensions": {
+        "sap.ui.controllerExtensions": {
+          "sap.fe.templates.ObjectPage.ObjectPageController": {
+            "controllerName": "cv.screening.candidates.ext.CVUploadController"
+          }
+        }
+      }
+    },
+    "resources": {
+      "css": [{ "uri": "css/custom.css" }]
+    },
+    "dependencies": {
+      "minUI5Version": "1.120.0",
+      "libs": {
+        "sap.fe.templates": {},
+        "sap.ui.unified": {}
+      }
+    },
+    "models": {
+      "": {
+        "dataSource": "mainService",
+        "settings": {
+          "synchronizationMode": "None",
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      },
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "cv.screening.candidates.i18n.i18n"
+        }
+      }
+    },
+    "routing": {
+      "routes": [
+        {
+          "pattern": ":?query:",
+          "name": "CandidatesList",
+          "target": "CandidatesList"
+        },
+        {
+          "pattern": "Candidates({key}):?query:",
+          "name": "CandidatesObjectPage",
+          "target": "CandidatesObjectPage"
+        }
+      ],
+      "targets": {
+        "CandidatesList": {
+          "type": "Component",
+          "id": "CandidatesList",
+          "name": "sap.fe.templates.ListReport",
+          "options": {
+            "settings": {
+              "entitySet": "Candidates",
+              "initialLoad": "Enabled",
+              "controlConfiguration": {
+                "@com.sap.vocabularies.UI.v1.LineItem": {
+                  "tableSettings": {
+                    "personalization": {
+                      "column": true,
+                      "sort": true,
+                      "group": false
+                    }
+                  }
+                }
+              },
+              "navigation": {
+                "Candidates": {
+                  "detail": {
+                    "route": "CandidatesObjectPage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "CandidatesObjectPage": {
+          "type": "Component",
+          "id": "CandidatesObjectPage",
+          "name": "sap.fe.templates.ObjectPage",
+          "options": {
+            "settings": {
+              "entitySet": "Candidates",
+              "editableHeaderContent": false,
+              "content": {
+                "header": {
+                  "facets": {
+                    "NavBarFacet": {
+                      "template": "cv.screening.candidates.ext.fragment.NavBar"
+                    }
+                  }
+                },
+                "body": {
+                  "sections": {
+                    "CVUploadSection": {
+                      "template": "cv.screening.candidates.ext.fragment.CVUpload",
+                      "title": "CV Upload & AI Processing",
+                      "position": {
+                        "placement": "After",
+                        "anchor": "CVInfo"
+                      }
+                    },
+                    "AIAnalysisSection": {
+                      "template": "cv.screening.candidates.ext.fragment.AIAnalysis",
+                      "title": "AI Analysis",
+                      "position": {
+                        "placement": "After",
+                        "anchor": "CVUploadSection"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

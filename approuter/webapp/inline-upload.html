@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>CV Upload</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: '72', '72full', Arial, sans-serif; background: transparent; color: #1d2d3e; }
+.widget { padding: 1rem 1.25rem 1.5rem; }
+
+/* ── Drop zone ── */
+.drop-zone {
+  border: 2px dashed #cdd5e0; border-radius: 10px;
+  padding: 1.4rem 1rem; text-align: center; cursor: pointer;
+  transition: border-color .2s, background .2s; background: #fafbfc;
+}
+.drop-zone:hover, .drop-zone.drag-over { border-color: #0070f2; background: #f0f7ff; }
+.drop-zone.has-file { border-color: #2e7d32; background: #f1faf1; }
+.drop-icon {
+  width: 2.4rem; height: 2.4rem; background: #e8f0fe; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center; margin: 0 auto .55rem;
+}
+.drop-icon svg { width: 1.2rem; height: 1.2rem; fill: #0070f2; }
+.drop-zone.has-file .drop-icon { background: #e8f5e9; }
+.drop-zone.has-file .drop-icon svg { fill: #2e7d32; }
+.drop-title { font-size: .88rem; font-weight: 600; color: #1d2d3e; margin-bottom: .18rem; }
+.drop-sub   { font-size: .77rem; color: #89919a; }
+.drop-browse {
+  display: inline-block; margin-top: .55rem; padding: .32rem .85rem;
+  border: 1.5px solid #0070f2; border-radius: 6px; font-size: .77rem;
+  font-weight: 600; color: #0070f2; cursor: pointer; background: #fff;
+}
+.drop-browse:hover { background: #f0f7ff; }
+.drop-zone.has-file .drop-browse { border-color: #2e7d32; color: #2e7d32; }
+.file-chosen { display: none; font-size: .8rem; color: #2e7d32; margin-top: .4rem; font-weight: 500; }
+.drop-zone.has-file .file-chosen { display: block; }
+input[type=file] { display: none; }
+
+/* ── Buttons ── */
+.actions { display: flex; gap: .55rem; margin-top: .85rem; flex-wrap: wrap; align-items: center; }
+.btn {
+  display: inline-flex; align-items: center; gap: .38rem;
+  padding: .48rem 1rem; border-radius: 6px; font-size: .81rem;
+  font-weight: 600; cursor: pointer; border: none; transition: all .15s; text-decoration: none;
+}
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn-primary { background: #0070f2; color: #fff; }
+.btn-primary:not(:disabled):hover  { background: #0060d0; }
+.btn-success  { background: #2e7d32; color: #fff; }
+.btn-success:not(:disabled):hover  { background: #256428; }
+.btn-outline  { background: #fff; color: #0070f2; border: 1.5px solid #0070f2; }
+.btn-outline:not(:disabled):hover  { background: #f0f7ff; }
+.spin {
+  width: 12px; height: 12px; border: 2px solid rgba(255,255,255,.35);
+  border-top-color: #fff; border-radius: 50%;
+  animation: spin .65s linear infinite; display: none;
+}
+.btn.loading .spin { display: inline-block; }
+.btn.loading .btn-lbl { opacity: .7; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Status ── */
+.status-msg {
+  display: none; align-items: flex-start; gap: .5rem;
+  padding: .65rem .85rem; border-radius: 6px;
+  font-size: .81rem; line-height: 1.5; margin-top: .8rem; animation: fadeIn .2s;
+}
+.status-msg.show { display: flex; }
+.status-msg.info { background: #e8f2ff; color: #0050a0; border-left: 4px solid #0070f2; }
+.status-msg.ok   { background: #edfaf0; color: #1a6b2e; border-left: 4px solid #2e7d32; }
+.status-msg.err  { background: #fff0f0; color: #b71c1c; border-left: 4px solid #c62828; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; } }
+
+/* ── Actions row ── */
+.refresh-row { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+
+/* ── Results wrapper ── */
+.results { display: none; }
+.results.show { display: block; }
+</style>
+</head>
+<body>
+<div class="widget">
+
+  <!-- Upload zone -->
+  <div class="drop-zone" id="dropZone">
+    <div class="drop-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>
+      </svg>
+    </div>
+    <div class="drop-title" id="dropTitle">Drop your CV here</div>
+    <div class="drop-sub">PDF or DOCX — up to 10 MB</div>
+    <div class="drop-browse" id="dropBrowse">Browse files</div>
+    <div class="file-chosen" id="fileChosen"></div>
+    <input type="file" id="fileInput"
+      accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"/>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="btnUpload" disabled>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+      <span class="btn-lbl">Upload CV</span>
+      <span class="spin"></span>
+    </button>
+    <button class="btn btn-outline" id="btnProcess" disabled>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      <span class="btn-lbl">Process with AI</span>
+      <span class="spin"></span>
+    </button>
+    <a href="view-cv.html" target="_blank" id="btnViewCv"
+       style="display:none" class="btn btn-outline">
+      &#128196; View CV
+    </a>
+  </div>
+
+  <div class="status-msg" id="statusMsg">
+    <span id="statusIcon"></span>
+    <span id="statusText"></span>
+  </div>
+
+  <!-- Success state after processing -->
+  <div class="results" id="results">
+    <div class="refresh-row" style="margin-top:.85rem">
+      <button class="btn btn-success" id="btnRefresh">
+        &#8635; View activated candidate with AI results
+      </button>
+    </div>
+  </div>
+
+</div>
+<script>
+(function () {
+  'use strict';
+
+  var candidateId = (function () {
+    try {
+      var m = window.parent.location.hash.match(/Candidates\(ID=([^,)]+)/);
+      if (m) { localStorage.setItem('cvCandidateId', m[1]); return m[1]; }
+    } catch (e) {}
+    return localStorage.getItem('cvCandidateId');
+  }());
+
+  var dropZone   = document.getElementById('dropZone');
+  var fileInput  = document.getElementById('fileInput');
+  var btnUpload  = document.getElementById('btnUpload');
+  var btnProcess = document.getElementById('btnProcess');
+  var btnViewCv  = document.getElementById('btnViewCv');
+  var statusMsg  = document.getElementById('statusMsg');
+  var results    = document.getElementById('results');
+
+  /* ── Init ── */
+  if (!candidateId) {
+    setStatus('err', '&#9888;', 'No candidate selected. Open this page from a candidate record.');
+  } else {
+    fetchCandidate(function (d) {
+      if (!d) return;
+      if (d.CVFileName) {
+        btnProcess.disabled = false;
+        btnViewCv.style.display = 'inline-flex';
+        setStatus('info', 'ℹ', 'CV on file: ' + esc(d.CVFileName) + ' — upload a new file or click Process with AI.');
+      }
+    });
+  }
+
+  /* ── Drop zone ── */
+  dropZone.addEventListener('dragover',  function (e) { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', function ()  { dropZone.classList.remove('drag-over'); });
+  dropZone.addEventListener('drop', function (e) {
+    e.preventDefault(); dropZone.classList.remove('drag-over');
+    if (e.dataTransfer && e.dataTransfer.files[0]) applyFile(e.dataTransfer.files[0]);
+  });
+  dropZone.addEventListener('click', function () { fileInput.click(); });
+  document.getElementById('dropBrowse').addEventListener('click', function (e) {
+    e.stopPropagation(); fileInput.click();
+  });
+  fileInput.addEventListener('change', function () {
+    if (this.files && this.files[0]) applyFile(this.files[0]);
+  });
+
+  btnUpload.addEventListener('click', doUpload);
+  btnProcess.addEventListener('click', doProcess);
+
+  document.getElementById('btnRefresh').addEventListener('click', function () {
+    try {
+      // If we were in draft context, navigate to the now-active entity instead of reloading
+      // (processCV auto-activates drafts, so the draft URL is gone after processing)
+      if (candidateId && window.parent.location.hash.indexOf('IsActiveEntity=false') !== -1) {
+        window.parent.location.hash = '#/Candidates(ID=' + candidateId + ',IsActiveEntity=true)';
+        return;
+      }
+    } catch (e) {}
+    window.parent.location.reload();
+  });
+
+  /* ── Helpers ── */
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function setStatus(type, icon, text) {
+    statusMsg.className = 'status-msg show ' + type;
+    document.getElementById('statusIcon').innerHTML = icon;
+    document.getElementById('statusText').textContent = text;
+  }
+
+  function setLoading(btn, loading) {
+    if (loading) { btn.classList.add('loading'); btn.disabled = true; }
+    else { btn.classList.remove('loading'); btn.disabled = false; }
+  }
+
+  function adjustHeight() {
+    if (window.frameElement) {
+      window.frameElement.style.height = (document.documentElement.scrollHeight + 24) + 'px';
+    }
+  }
+
+  function fetchCandidate(cb) {
+    var base = '/candidate/Candidates(ID=' + candidateId + ',IsActiveEntity=';
+    fetch(base + 'true)', { headers: { Accept: 'application/json' }, cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('try draft'); return r.json(); })
+      .catch(function () {
+        return fetch(base + 'false)', { headers: { Accept: 'application/json' }, cache: 'no-store' })
+          .then(function (r) { return r.ok ? r.json() : null; });
+      })
+      .then(function (d) { cb(d); })
+      .catch(function () { cb(null); });
+  }
+
+  /* ── File selection ── */
+  function applyFile(file) {
+    dropZone.classList.add('has-file');
+    document.getElementById('dropTitle').textContent = 'File ready to upload';
+    document.getElementById('dropBrowse').textContent = 'Change file';
+    document.getElementById('fileChosen').textContent = '✓ ' + file.name;
+    var dt = new DataTransfer();
+    dt.items.add(file);
+    fileInput.files = dt.files;
+    btnUpload.disabled = false;
+    setStatus('info', 'ℹ', file.name + ' selected. Click Upload CV to continue.');
+  }
+
+  /* ── Upload ── */
+  function doUpload() {
+    var file = fileInput.files[0];
+    if (!file || !candidateId) return;
+    setLoading(btnUpload, true);
+    setStatus('info', '⏳', 'Uploading ' + esc(file.name) + '…');
+    var fd = new FormData();
+    fd.append('cv', file, file.name);
+    fetch('/upload/' + candidateId, { method: 'POST', body: fd })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        setLoading(btnUpload, false);
+        if (d.success) {
+          setStatus('ok', '✓', 'Uploaded (' + d.extractedLength.toLocaleString() + ' characters extracted). Now click Process with AI.');
+          btnProcess.disabled = false;
+          btnViewCv.style.display = 'inline-flex';
+        } else {
+          setStatus('err', '✕', d.error || 'Upload failed.');
+        }
+      })
+      .catch(function (e) {
+        setLoading(btnUpload, false);
+        setStatus('err', '✕', 'Upload failed: ' + e.message);
+      });
+  }
+
+  /* ── AI Process ── */
+  function doProcess() {
+    if (!candidateId) return;
+    setLoading(btnProcess, true);
+    setStatus('info', '⏳', 'AI is analysing the CV… this usually takes 10–20 seconds.');
+    fetch('/candidate/processCV', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ candidateID: candidateId })
+    })
+    .then(function (r) {
+      if (!r.ok) return r.json().then(function (e) { throw new Error((e.error && e.error.message) || 'AI processing failed.'); });
+      return r.json();
+    })
+    .then(function () {
+      setLoading(btnProcess, false);
+      var inDraft = (function () { try { return window.parent.location.hash.indexOf('IsActiveEntity=false') !== -1; } catch (e) { return false; } }());
+      setStatus('ok', '✓', inDraft ? 'Done! Click the button below to view the activated candidate.' : 'AI processing complete. Scroll down to see the AI Analysis section.');
+      results.classList.add('show');
+    })
+    .catch(function (e) {
+      setLoading(btnProcess, false);
+      setStatus('err', '✕', e.message || 'AI processing failed.');
+    });
+  }
+
+
+}());
+</script>
+</body>
+</html>

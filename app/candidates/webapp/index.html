@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CV Screening</title>
+    <style>
+        html, body { margin: 0; height: 100%; overflow: hidden; }
+        #loader {
+            position: fixed; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: #fff; font-family: Arial, sans-serif;
+        }
+        .spinner {
+            width: 48px; height: 48px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #0a6ed1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="sapUiBody" id="content">
+
+    <!-- Visible spinner — if you never see this, the HTML itself failed -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <div style="color:#555;font-size:14px">Loading CV Screening&hellip;</div>
+    </div>
+
+    <!-- Same UI5 version the Fiori preview uses (1.133.0) -->
+    <script id="sap-ui-bootstrap"
+        src="https://sapui5.hana.ondemand.com/1.133.0/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_horizon"
+        data-sap-ui-libs="sap.m,sap.ui.core,sap.fe.templates"
+        data-sap-ui-resourceroots='{"cv.screening.candidates": "./"}'
+        data-sap-ui-compatVersion="edge"
+        data-sap-ui-preload="off"
+        data-sap-ui-async="true"
+        data-sap-ui-frameOptions="trusted">
+    </script>
+
+    <script src="./utils/uploader.js"></script>
+    <script>
+        sap.ui.getCore().attachInit(function () {
+            sap.ui.require(
+                ["sap/ui/core/Component", "sap/ui/core/ComponentContainer"],
+                function (Component, ComponentContainer) {
+                    Component.create({
+                        name    : "cv.screening.candidates",
+                        manifest: true
+                    }).then(function (oComponent) {
+                        document.getElementById("loader").style.display = "none";
+                        new ComponentContainer({
+                            component: oComponent,
+                            height   : "100%",
+                            width    : "100%"
+                        }).placeAt("content");
+                    }).catch(function (err) {
+                        // Show the real error directly on screen — no F12 needed
+                        document.getElementById("loader").innerHTML =
+                            '<div style="color:#bb0000;padding:32px;font-family:monospace;font-size:13px;max-width:800px">' +
+                            '<b>Component failed to load:</b><br><br>' + err + '</div>';
+                    });
+                }
+            );
+        });
+    </script>
+</body>
+</html>

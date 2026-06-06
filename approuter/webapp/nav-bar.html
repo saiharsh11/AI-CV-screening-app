@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: '72', '72full', Arial, sans-serif; background: transparent; }
+.bar {
+  display: flex; align-items: center; gap: 1rem;
+  padding: .4rem 0;
+}
+.back-btn {
+  display: inline-flex; align-items: center; gap: .35rem;
+  font-size: .8rem; font-weight: 600; color: #0070f2;
+  text-decoration: none; padding: .32rem .75rem;
+  border: 1.5px solid #0070f2; border-radius: 6px; background: #fff;
+  white-space: nowrap;
+}
+.back-btn:hover { background: #f0f7ff; }
+.id-badge {
+  display: inline-flex; align-items: center; gap: .35rem;
+  font-size: .78rem; color: #556b82;
+  background: #f0f2f5; border-radius: 6px;
+  padding: .3rem .7rem;
+}
+.id-label { font-weight: 700; color: #89919a; text-transform: uppercase; font-size: .68rem; letter-spacing: .05em; }
+.id-value { font-family: 'Courier New', monospace; font-size: .75rem; color: #1d2d3e; font-weight: 600; letter-spacing: .02em; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <a href="index.html" target="_top" class="back-btn">&#8592; Candidates List</a>
+</div>
+<script>
+(function () {
+  var id = localStorage.getItem('cvCandidateId');
+  if (id) {
+    document.getElementById('idValue').textContent = id;
+    document.getElementById('idBadge').style.display = 'inline-flex';
+  }
+}());
+</script>
+</body>
+</html>

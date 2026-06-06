@@ -1,0 +1,13 @@
+node_modules/
+gen/
+db.sqlite
+.env
+uploads/*
+!uploads/.gitkeep
+*.mtar
+mta_archives/
+default-env.json
+.npmrc
+server.log
+server.err
+*.bak

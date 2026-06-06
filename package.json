@@ -1,0 +1,73 @@
+{
+  "name": "cv-screening-app",
+  "version": "1.0.0",
+  "description": "AI-Powered CV Screening Application using SAP CAP and Fiori Elements",
+  "scripts": {
+    "start": "cds-serve",
+    "watch": "cds watch",
+    "build": "cds build --production",
+    "build:mta": "mbt build -t gen --mtar mta_archives",
+    "deploy:cf": "cf deploy gen/mta_archives/*.mtar --delete-extended-resources true"
+  },
+  "dependencies": {
+    "@cap-js/hana": "^1.9.2",
+    "@cap-js/sqlite": "^1",
+    "@sap/cds": "^8",
+    "@sap/xssec": "^4.13.0",
+    "dotenv": "^16.4.5",
+    "mammoth": "^1.8.0",
+    "multer": "^1.4.5-lts.1",
+    "openai": "^4.47.0",
+    "pdf-parse": "^1.1.1"
+  },
+  "devDependencies": {
+    "@sap/cds-dk": "^8"
+  },
+  "overrides": {
+    "better-sqlite3": "12.10.0"
+  },
+  "sapux": [
+    "app/candidates"
+  ],
+  "cds": {
+    "model": [
+      "db",
+      "srv",
+      "app"
+    ],
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "credentials": {
+          "database": "db.sqlite"
+        }
+      }
+    },
+    "[production]": {
+      "model": [
+        "db",
+        "srv"
+      ],
+      "requires": {
+        "db": {
+          "kind": "hana"
+        }
+      }
+    },
+    "features": {
+      "fiori_preview": true
+    },
+    "fiori": {
+      "preview": {
+        "ui5": {
+          "version": "1.133.0",
+          "theme": {
+            "light": "sap_horizon",
+            "dark": "sap_horizon_dark",
+            "switch": true
+          }
+        }
+      }
+    }
+  }
+}
