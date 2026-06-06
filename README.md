@@ -2,6 +2,8 @@
 
 A full-stack SAP BTP application built with **SAP CAP (Node.js)** and **SAP Fiori Elements** that automates candidate CV screening using AI.
 
+**Live Demo:** https://c267cb81trial-dev-cv-screening-app.cfapps.ap21.hana.ondemand.com
+
 ---
 
 ## Features
