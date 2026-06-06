@@ -20,6 +20,25 @@ A full-stack SAP BTP application built with **SAP CAP (Node.js)** and **SAP Fior
 
 ---
 
+## Screenshots
+
+### List Report — Candidate Overview
+![List Report](screenshots/list-report.png)
+
+### Object Page — Candidate Details & CV Upload
+![Object Page](screenshots/object-page.png)
+
+### CV Upload & AI Processing
+![CV Upload and AI Processing](screenshots/cv-upload-processing.png)
+
+### AI Analysis Results
+![AI Analysis](screenshots/ai-analysis.png)
+
+### Deployed on SAP BTP
+![BTP Deployment](screenshots/btp-deployment.png)
+
+---
+
 ## Architecture
 
 ```
