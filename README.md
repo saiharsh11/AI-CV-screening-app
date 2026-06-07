@@ -1,6 +1,6 @@
 # AI-Powered CV Screening Application
 
-A full-stack SAP BTP application built with **SAP CAP (Node.js)** and **SAP Fiori Elements** that automates candidate CV screening using AI.
+A full-stack SAP BTP application built with SAP CAP (Node.js) and SAP Fiori Elements that automates candidate CV screening using AI.
 
 **Live Demo:** https://c267cb81trial-dev-cv-screening-app.cfapps.ap21.hana.ondemand.com
 
@@ -96,7 +96,7 @@ cd cv-screening-app
 npm install
 ```
 
-> **Node.js v22+ / v26+ note:** If `npm install` fails with a `better-sqlite3` build error,
+> Node.js v22+ / v26+ note: If `npm install` fails with a `better-sqlite3` build error,
 > run `npm install --ignore-scripts` instead. Pre-built binaries are available for all
 > modern Node.js versions and will be used automatically.
 
@@ -114,35 +114,35 @@ npm run watch
 # or: npx cds watch
 ```
 
-The server starts at **http://localhost:4004**.
+The server starts at http://localhost:4004.
 
 - Fiori UI: http://localhost:4004/app/candidates/webapp/index.html
 - OData service: http://localhost:4004/odata/v4/candidate/
 
-> **Tip:** `cds watch` auto-reloads on file changes and auto-deploys the schema to SQLite.
+> Tip: `cds watch` auto-reloads on file changes and auto-deploys the schema to SQLite.
 
 ---
 
 ## Using the Application
 
-### Step 1 — Create a Candidate
+### Step 1 : Create a Candidate
 
-1. Open the Fiori app and click **Create** on the List Report page.
-2. Fill in at least the **Full Name** field (all others are optional — AI will populate them).
-3. Click **Save**.
+1. Open the Fiori app and click Create on the List Report page.
+2. Fill in at least the Full Name field (all others are optional — AI will populate them).
+3. Click Save.
 
-### Step 2 — Upload a CV
+### Step 2 : Upload a CV
 
 1. Open the candidate's Object Page.
-2. In the **CV Upload & AI Processing** section, click **Browse** and select a `.pdf` or `.docx` file.
-3. Click **Upload CV**.
+2. In the CV Upload & AI Processing section, click Browse and select a `.pdf` or `.docx` file.
+3. Click Upload CV.
 4. A success message will confirm the text was extracted.
 
-### Step 3 — Process with AI
+### Step 3 : Process with AI
 
-1. Click **Process with AI** in the same section.
+1. Click Process with AI in the same section.
 2. Wait a few seconds while OpenAI analyses the CV.
-3. The candidate record automatically refreshes — all fields (name, email, phone, skills, experience, role) and the **AI Summary** are now populated.
+3. The candidate record automatically refreshes — all fields (name, email, phone, skills, experience, role) and the AI Summary are now populated.
 
 ---
 
@@ -177,7 +177,7 @@ cv-screening-app/
 
 ## AI Integration
 
-### Data Extraction (`extractStructuredData`)
+### Data Extraction 
 
 Sends the raw CV text to OpenAI and requests a structured JSON response:
 
@@ -194,8 +194,7 @@ Sends the raw CV text to OpenAI and requests a structured JSON response:
 
 The prompt uses `response_format: { type: "json_object" }` to guarantee valid JSON output and `temperature: 0.1` to minimise hallucination.
 
-### Summary Generation (`generateSummary`)
-
+### Summary Generation
 Sends the same CV text with a structured output prompt that always returns:
 
 ```
@@ -214,13 +213,13 @@ SUGGESTED ROLE FIT
 
 ---
 
-## BTP Cloud Foundry Deployment (Bonus)
+## BTP Cloud Foundry Deployment
 
 ### Prerequisites
 
 1. [SAP BTP Trial account](https://cockpit.btp.cloud.sap/)
 2. Cloud Foundry space created
-3. **SAP HANA Cloud** free tier instance (create in BTP Cockpit → SAP HANA Cloud)
+3. SAP HANA Cloud free tier instance (create in BTP Cockpit → SAP HANA Cloud)
 4. CF CLI installed: `cf --version`
 5. MBT build tool: `npm install -g mbt`
 6. CF MTA plugin: `cf install-plugin multiapps`
