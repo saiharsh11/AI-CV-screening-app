@@ -37,7 +37,8 @@ A full-stack SAP BTP application built with **SAP CAP (Node.js)** and **SAP Fior
 ### CV Upload & AI Processing
 
 <img width="929" height="226" alt="image" src="https://github.com/user-attachments/assets/671c55d0-cb9a-4471-b7d6-978672d7cb2b" />
-<img width="935" height="263" alt="image" src="https://github.com/user-attachments/assets/b3297150-ad01-4173-95d1-d0c05df90f4b" />
+<img width="953" height="329" alt="image" src="https://github.com/user-attachments/assets/01370642-5961-4c3f-b593-1c4a49e637dc" />
+
 
 
 
