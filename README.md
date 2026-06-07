@@ -42,12 +42,11 @@ A full-stack SAP BTP application built with **SAP CAP (Node.js)** and **SAP Fior
 
 
 ### AI Analysis Results
-
-<img width="946" height="452" alt="image" src="https://github.com/user-attachments/assets/b6d6b39b-12ca-4c10-be16-7e670977a2bb" />
+<img width="955" height="434" alt="image" src="https://github.com/user-attachments/assets/79efbf63-96c1-45fa-a653-beaf62f64615" />
 
 
 ### Deployed on SAP BTP
-![BTP Deployment](screenshots/btp-deployment.png)
+
 
 <img width="958" height="385" alt="image" src="https://github.com/user-attachments/assets/80abaa42-eee1-4b58-9fbf-d412bf140705" />
 <img width="956" height="341" alt="image" src="https://github.com/user-attachments/assets/71ead4e2-6b78-40c9-a3e5-efee2f0aa307" />
