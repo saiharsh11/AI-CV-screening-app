@@ -24,7 +24,8 @@ A full-stack SAP BTP application built with **SAP CAP (Node.js)** and **SAP Fior
 
 ### List Report — Candidate Overview
 
-<img width="956" height="421" alt="image" src="https://github.com/user-attachments/assets/09bc6fa6-5d67-4b64-bde2-9d99225ee47f" />
+<img width="956" height="341" alt="image" src="https://github.com/user-attachments/assets/0a596bbd-127b-487a-81e1-7804cf8375a1" />
+
 
 
 ### Object Page — Candidate Details & CV Upload
@@ -34,13 +35,24 @@ A full-stack SAP BTP application built with **SAP CAP (Node.js)** and **SAP Fior
 
 
 ### CV Upload & AI Processing
-![CV Upload and AI Processing](screenshots/cv-upload-processing.png)
+
+<img width="929" height="226" alt="image" src="https://github.com/user-attachments/assets/671c55d0-cb9a-4471-b7d6-978672d7cb2b" />
+<img width="935" height="263" alt="image" src="https://github.com/user-attachments/assets/b3297150-ad01-4173-95d1-d0c05df90f4b" />
+
+
 
 ### AI Analysis Results
-![AI Analysis](screenshots/ai-analysis.png)
+
+<img width="946" height="452" alt="image" src="https://github.com/user-attachments/assets/b6d6b39b-12ca-4c10-be16-7e670977a2bb" />
+
 
 ### Deployed on SAP BTP
 ![BTP Deployment](screenshots/btp-deployment.png)
+
+<img width="958" height="385" alt="image" src="https://github.com/user-attachments/assets/80abaa42-eee1-4b58-9fbf-d412bf140705" />
+<img width="956" height="341" alt="image" src="https://github.com/user-attachments/assets/71ead4e2-6b78-40c9-a3e5-efee2f0aa307" />
+
+
 
 ---
 
