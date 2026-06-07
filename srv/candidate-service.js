@@ -214,7 +214,15 @@ module.exports = class CandidateService extends cds.ApplicationService {
                 await UPDATE(Candidates).set(aiFields).where({ ID: candidateID });
             }
 
-            return 'CV processed successfully. Candidate profile updated with AI-extracted data.';
+            return JSON.stringify({
+                FullName:          aiFields.FullName,
+                Email:             aiFields.Email,
+                Skills:            aiFields.Skills,
+                YearsOfExperience: aiFields.YearsOfExperience,
+                CurrentRole:       aiFields.CurrentRole,
+                CVText:            candidate.CVText,
+                AISummary:         summary
+            });
         });
 
         return super.init();

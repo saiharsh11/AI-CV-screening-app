@@ -77,6 +77,25 @@ input[type=file] { display: none; }
 /* ── Results wrapper ── */
 .results { display: none; }
 .results.show { display: block; }
+
+/* ── Mini preview card ── */
+.preview-card { display:none; margin-top:1rem; border:1px solid #e4e7ec; border-radius:8px; overflow:hidden; }
+.preview-card.show { display:block; }
+.preview-hd { font-size:.73rem; font-weight:700; color:#fff; background:#0070f2; text-transform:uppercase; letter-spacing:.07em; padding:.38rem .85rem; }
+.preview-fields { display:grid; grid-template-columns:1fr 1fr; gap:.5rem .85rem; padding:.7rem .85rem .5rem; }
+.preview-field-lbl { font-size:.72rem; color:#89919a; margin-bottom:.1rem; }
+.preview-field-val { font-size:.82rem; font-weight:600; color:#1d2d3e; word-break:break-word; }
+.preview-summary-hd { font-size:.73rem; font-weight:700; color:#556b82; text-transform:uppercase; letter-spacing:.07em; padding:.1rem .85rem .25rem; border-top:1px solid #f0f2f5; margin-top:.25rem; }
+.preview-summary-txt { font-size:.81rem; color:#2c3e50; line-height:1.65; padding:.0rem .85rem .75rem; }
+.preview-cvtext-hd { font-size:.73rem; font-weight:700; color:#556b82; text-transform:uppercase; letter-spacing:.07em; padding:.1rem .85rem .25rem; border-top:1px solid #f0f2f5; }
+.preview-cvtext-box { font-size:.78rem; color:#445566; line-height:1.65; padding:0 .85rem .75rem; white-space:pre-wrap; word-break:break-word; max-height:140px; overflow-y:auto; }
+.ps-sec { padding:.45rem .85rem; border-top:1px solid #f0f2f5; }
+.ps-sec:first-child { border-top:none; }
+.ps-sec-lbl { font-size:.68rem; font-weight:700; color:#fff; background:#0070f2; text-transform:uppercase; letter-spacing:.06em; display:inline-block; padding:.15rem .5rem; border-radius:3px; margin-bottom:.3rem; }
+.ps-text { font-size:.81rem; color:#2c3e50; line-height:1.65; margin:0; }
+.ps-list { list-style:none; padding:0; margin:0; }
+.ps-list li { font-size:.81rem; color:#2c3e50; line-height:1.6; padding:.15rem 0 .15rem 1rem; position:relative; }
+.ps-list li::before { content:''; position:absolute; left:0; top:.58rem; width:6px; height:6px; border-radius:50%; background:#0070f2; }
 </style>
 </head>
 <body>
@@ -126,6 +145,16 @@ input[type=file] { display: none; }
         &#8635; View activated candidate with AI results
       </button>
     </div>
+  </div>
+
+  <!-- Mini preview shown immediately after AI processing -->
+  <div class="preview-card" id="previewCard">
+    <div class="preview-hd">&#10024; AI Extraction Results</div>
+    <div class="preview-fields" id="previewFields"></div>
+    <div class="preview-summary-hd">Professional Summary</div>
+    <div class="preview-summary-txt" id="previewSummary"></div>
+    <div class="preview-cvtext-hd">Extracted CV Text</div>
+    <div class="preview-cvtext-box" id="previewCvText"></div>
   </div>
 
 </div>
@@ -266,6 +295,69 @@ input[type=file] { display: none; }
       });
   }
 
+  /* ── Mini preview after processing ── */
+  function showPreview(responseStr) {
+    var d = null;
+    try { d = JSON.parse(responseStr && responseStr.value ? responseStr.value : responseStr); } catch (e) {}
+    if (d && (d.AISummary || d.CVText)) {
+      try { localStorage.setItem('cvData_' + candidateId, JSON.stringify(d)); } catch (e) {}
+      localStorage.setItem('cvProcessed_' + candidateId, Date.now().toString());
+      renderPreview(d);
+    }
+  }
+
+  function renderPreview(d) {
+    if (!d || (!d.AISummary && !d.CVText)) return;
+    var fields = '';
+    if (d.FullName)                  fields += field('Full Name',   d.FullName);
+    if (d.CurrentRole)               fields += field('Role',        d.CurrentRole);
+    if (d.YearsOfExperience != null) fields += field('Experience',  d.YearsOfExperience + ' yrs');
+    if (d.Skills)                    fields += field('Skills',      d.Skills);
+    if (d.Email)                     fields += field('Email',       d.Email);
+    document.getElementById('previewFields').innerHTML = fields;
+
+    var summaryHtml = '';
+    if (d.AISummary) {
+      var sections = [
+        { key: 'PROFESSIONAL SUMMARY', label: 'Professional Summary' },
+        { key: 'KEY STRENGTHS',        label: 'Key Strengths'        },
+        { key: 'SUGGESTED ROLE FIT',   label: 'Suggested Role Fit'   }
+      ];
+      sections.forEach(function (sec, i) {
+        var idx = d.AISummary.indexOf(sec.key);
+        if (idx === -1) return;
+        var nextIdx = -1;
+        for (var j = i + 1; j < sections.length; j++) {
+          var ni = d.AISummary.indexOf(sections[j].key, idx + sec.key.length);
+          if (ni > -1) { nextIdx = ni; break; }
+        }
+        var content = (nextIdx > -1
+          ? d.AISummary.slice(idx + sec.key.length, nextIdx)
+          : d.AISummary.slice(idx + sec.key.length)).trim();
+        summaryHtml += '<div class="ps-sec"><div class="ps-sec-lbl">' + esc(sec.label) + '</div>';
+        if (sec.key === 'KEY STRENGTHS') {
+          var items = content.split('\n').filter(function (l) { return l.trim().match(/^[•\-]/); });
+          if (items.length) {
+            summaryHtml += '<ul class="ps-list">';
+            items.forEach(function (it) { summaryHtml += '<li>' + esc(it.replace(/^[\s•\-]+/, '').trim()) + '</li>'; });
+            summaryHtml += '</ul>';
+          } else { summaryHtml += '<p class="ps-text">' + esc(content) + '</p>'; }
+        } else {
+          summaryHtml += '<p class="ps-text">' + esc(content) + '</p>';
+        }
+        summaryHtml += '</div>';
+      });
+    }
+    document.getElementById('previewSummary').innerHTML = summaryHtml || '<p class="ps-text">—</p>';
+    document.getElementById('previewCvText').textContent = (d.CVText || '').trim().slice(0, 600) + (d.CVText && d.CVText.length > 600 ? '…' : '');
+    document.getElementById('previewCard').classList.add('show');
+    adjustHeight();
+  }
+
+  function field(lbl, val) {
+    return '<div><div class="preview-field-lbl">' + esc(lbl) + '</div><div class="preview-field-val">' + esc(String(val)) + '</div></div>';
+  }
+
   /* ── AI Process ── */
   function doProcess() {
     if (!candidateId) return;
@@ -280,11 +372,12 @@ input[type=file] { display: none; }
       if (!r.ok) return r.json().then(function (e) { throw new Error((e.error && e.error.message) || 'AI processing failed.'); });
       return r.json();
     })
-    .then(function () {
+    .then(function (responseStr) {
       setLoading(btnProcess, false);
       var inDraft = (function () { try { return window.parent.location.hash.indexOf('IsActiveEntity=false') !== -1; } catch (e) { return false; } }());
-      setStatus('ok', '✓', inDraft ? 'Done! Click the button below to view the activated candidate.' : 'AI processing complete. Scroll down to see the AI Analysis section.');
+      setStatus('ok', '✓', inDraft ? 'Done! Click the button below to view the activated candidate.' : 'AI processing complete. Results shown below.');
       results.classList.add('show');
+      showPreview(responseStr);
     })
     .catch(function (e) {
       setLoading(btnProcess, false);

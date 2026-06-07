@@ -220,14 +220,29 @@ body { font-family: '72', '72full', Arial, sans-serif; background: transparent; 
   }
 
   var base = '/candidate/Candidates(ID=' + candidateId + ',IsActiveEntity=';
-  fetch(base + 'true)', { headers: { Accept: 'application/json' }, cache: 'no-store' })
-    .then(function (r) { if (!r.ok) throw new Error('try draft'); return r.json(); })
-    .catch(function () {
-      return fetch(base + 'false)', { headers: { Accept: 'application/json' }, cache: 'no-store' })
-        .then(function (r) { return r.ok ? r.json() : null; });
-    })
-    .then(function (d) { render(d); })
-    .catch(function () { adjustHeight(); });
+
+  function fetchAndRender() {
+    fetch(base + 'true)', { headers: { Accept: 'application/json' }, cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('try draft'); return r.json(); })
+      .catch(function () {
+        return fetch(base + 'false)', { headers: { Accept: 'application/json' }, cache: 'no-store' })
+          .then(function (r) { return r.ok ? r.json() : null; });
+      })
+      .then(function (d) { render(d); })
+      .catch(function () { adjustHeight(); });
+  }
+
+  fetchAndRender();
+
+  window.addEventListener('storage', function (e) {
+    if (e.key === 'cvProcessed_' + candidateId) {
+      try {
+        var stored = localStorage.getItem('cvData_' + candidateId);
+        if (stored) { render(JSON.parse(stored)); return; }
+      } catch (e2) {}
+      fetchAndRender();
+    }
+  });
 
 }());
 </script>
