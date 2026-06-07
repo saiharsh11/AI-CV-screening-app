@@ -22,13 +22,13 @@ A full-stack SAP BTP application built with SAP CAP (Node.js) and SAP Fiori Elem
 
 ## Screenshots
 
-### List Report — Candidate Overview
+### List Report: Candidate Overview
 
 <img width="956" height="341" alt="image" src="https://github.com/user-attachments/assets/0a596bbd-127b-487a-81e1-7804cf8375a1" />
 
 
 
-### Object Page — Candidate Details & CV Upload
+### Object Page: Candidate Details & CV Upload
 
 
 <img width="953" height="533" alt="image" src="https://github.com/user-attachments/assets/b45ab0b1-6b56-4d64-9646-6c87ce4b6b61" />
