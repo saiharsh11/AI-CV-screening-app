@@ -144,7 +144,7 @@ The server starts at http://localhost:4004.
 1. Click Process with AI in the same section.
 2. Wait a few seconds while OpenAI analyses the CV.
 3. An inline preview card appears immediately below — showing extracted fields (name, email, skills, experience, role) and the full AI summary (Professional Summary, Key Strengths, Suggested Role Fit).
-4. The **AI Analysis** section on the page also updates automatically.
+4. The AI Analysis section on the page also updates automatically.
 
 ---
 
