@@ -13,7 +13,8 @@ A full-stack SAP BTP application built with SAP CAP (Node.js) and SAP Fiori Elem
 | Upload PDF / DOCX CVs | Custom Express route + `multer` (memory storage) |
 | Extract raw CV text | `pdf-parse` (PDF) and `mammoth` (DOCX) |
 | AI data extraction | OpenAI GPT-4o-mini — returns structured JSON |
-| AI professional summary | OpenAI GPT-4o-mini — returns formatted assessment |
+| AI professional summary | OpenAI GPT-4o-mini — Professional Summary, Key Strengths, Suggested Role Fit |
+| Inline AI preview | Extracted fields + full AI summary shown immediately after processing |
 | Fiori List Report | CAP OData V4 + Fiori Elements annotations |
 | Fiori Object Page | Sections for details, upload panel, AI results |
 | BTP deployment | MTA build + Cloud Foundry + HANA Cloud |
@@ -142,7 +143,8 @@ The server starts at http://localhost:4004.
 
 1. Click Process with AI in the same section.
 2. Wait a few seconds while OpenAI analyses the CV.
-3. The candidate record automatically refreshes — all fields (name, email, phone, skills, experience, role) and the AI Summary are now populated.
+3. An inline preview card appears immediately below — showing extracted fields (name, email, skills, experience, role) and the full AI summary (Professional Summary, Key Strengths, Suggested Role Fit).
+4. The **AI Analysis** section on the page also updates automatically.
 
 ---
 
