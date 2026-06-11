@@ -76,6 +76,8 @@ A full-stack SAP BTP application built with SAP CAP (Node.js) and SAP Fiori Elem
      SQLite / HANA              OpenAI API
      (Candidates table)         (gpt-4o-mini)
 ```
+<img width="714" height="289" alt="image" src="https://github.com/user-attachments/assets/9c25866d-2341-49d9-8696-4e13d9574478" />
+
 
 ---
 
